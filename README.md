@@ -12,6 +12,32 @@ The project is laid out like a PROS template library: public headers live under
 Makefile declares `IS_LIBRARY:=1` so it can be packaged in the same style as
 LemLib when used with a PROS project.
 
+## Install
+
+Add the WallSnap depot once:
+
+```sh
+pros c add-depot WallSnap https://raw.githubusercontent.com/LeonCai100/WallSnap/depot/stable.json
+```
+
+Apply WallSnap to a PROS V5 project:
+
+```sh
+pros c apply WallSnap
+```
+
+Update WallSnap later:
+
+```sh
+pros c upgrade WallSnap
+```
+
+Then include the umbrella header:
+
+```cpp
+#include "wallsnap/wallsnap.hpp"
+```
+
 ## Why Wall Resets Help
 
 Tracking wheels, IMUs, and motor encoders drift over an autonomous run. Field
@@ -179,3 +205,16 @@ Common causes are:
 
 Use `calculateSoftCorrection(pose, 0.3)` or set `config.blend` below `1.0` if
 you want gentle corrections instead of hard coordinate resets.
+
+## Publishing A Release
+
+WallSnap follows LemLib's release pattern:
+
+1. Update `VERSION` in `Makefile`.
+2. Commit the change.
+3. Tag the release, for example `v0.1.0`.
+4. Push `main` and the tag.
+
+GitHub Actions builds `WallSnap@VERSION.zip`, uploads it to the GitHub Release,
+and publishes `stable.json` to the `depot` branch. Users install from that depot
+with the commands above.

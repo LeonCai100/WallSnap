@@ -24,7 +24,7 @@ VERSION:=0.1.0
 
 EXCLUDE_SRC_FROM_LIB+=$(foreach file, $(SRCDIR)/main,$(foreach cext,$(CEXTS),$(file).$(cext)) $(foreach cxxext,$(CXXEXTS),$(file).$(cxxext)))
 
-TEMPLATE_FILES=$(INCDIR)/wallsnap/*.hpp
+TEMPLATE_FILES=$(INCDIR)/wallsnap/*.hpp $(SRCDIR)/wallsnap/*.cpp
 
 .DEFAULT_GOAL=quick
 
@@ -33,4 +33,3 @@ TEMPLATE_FILES=$(INCDIR)/wallsnap/*.hpp
 ########## Nothing below this line should be edited by typical users ###########
 
 -include ./common.mk
-
