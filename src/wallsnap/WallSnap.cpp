@@ -287,6 +287,25 @@ double WallSnap::sensorAbsoluteY(const Pose& absolutePose, const SensorConfig& s
     return absolutePose.y + sensor.offsetX * rightY + sensor.offsetY * frontY;
 }
 
+std::optional<double> WallSnap::expectedDistanceToWall(
+    const Pose& absolutePose,
+    const SensorConfig& sensor) const {
+    const double sensorX = sensorAbsoluteX(absolutePose, sensor);
+    const double sensorY = sensorAbsoluteY(absolutePose, sensor);
+
+    switch (sensor.targetWall) {
+        case Wall::LEFT:
+            return sensorX - getWallPosition(Wall::LEFT);
+        case Wall::RIGHT:
+            return getWallPosition(Wall::RIGHT) - sensorX;
+        case Wall::BACK:
+            return sensorY - getWallPosition(Wall::BACK);
+        case Wall::FRONT:
+            return getWallPosition(Wall::FRONT) - sensorY;
+    }
+    return std::nullopt;
+}
+
 std::optional<double> WallSnap::calculateXFromSensor(
     const Pose& absolutePose,
     const SensorConfig& sensor,
@@ -342,11 +361,30 @@ WallSnap::AxisCandidates WallSnap::collectCandidates(
         const double angleErrorRad = degToRad(angleErrorDeg);
         const double rawDistanceInches = mmToInches(reading->distanceMM);
         const double correctedDistanceInches = rawDistanceInches * std::cos(angleErrorRad);
+        const std::optional<double> expectedDistance = expectedDistanceToWall(absolutePose, sensor);
+        if (!expectedDistance.has_value() || *expectedDistance < 0.0) {
+            result.debugLog.push_back(formatReject(sensor, "expected wall distance is invalid"));
+            continue;
+        }
+
+        const double distanceError = std::abs(correctedDistanceInches - *expectedDistance);
+        if (distanceError > config.maxDistanceErrorInches) {
+            std::ostringstream rejected;
+            rejected << sensorName(sensor)
+                     << ": rejected, measured wall distance does not match current pose"
+                     << " measuredIn=" << correctedDistanceInches
+                     << " expectedIn=" << *expectedDistance
+                     << " errorIn=" << distanceError;
+            result.debugLog.push_back(rejected.str());
+            continue;
+        }
 
         std::ostringstream accepted;
         accepted << sensorName(sensor) << ": accepted, median=" << reading->distanceMM
                  << "mm confidence=" << reading->confidence
-                 << " angleErrorDeg=" << angleErrorDeg;
+                 << " angleErrorDeg=" << angleErrorDeg
+                 << " expectedIn=" << *expectedDistance
+                 << " measuredIn=" << correctedDistanceInches;
         result.debugLog.push_back(accepted.str());
 
         if (sensor.targetWall == Wall::LEFT || sensor.targetWall == Wall::RIGHT) {

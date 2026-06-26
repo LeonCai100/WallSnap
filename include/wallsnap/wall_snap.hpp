@@ -62,6 +62,7 @@ struct WallSnapConfig {
     int maxDistanceMM = 1500;
     int minConfidence = 35;
     double maxAngleErrorDeg = 12.0;
+    double maxDistanceErrorInches = 12.0;
     double blend = 1.0;
 };
 
@@ -125,6 +126,9 @@ private:
 
     double sensorAbsoluteX(const Pose& absolutePose, const SensorConfig& sensor) const;
     double sensorAbsoluteY(const Pose& absolutePose, const SensorConfig& sensor) const;
+    std::optional<double> expectedDistanceToWall(
+        const Pose& absolutePose,
+        const SensorConfig& sensor) const;
 
     std::optional<double> calculateXFromSensor(
         const Pose& absolutePose,
@@ -140,4 +144,3 @@ private:
 };
 
 }  // namespace wallsnap
-

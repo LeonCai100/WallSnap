@@ -37,6 +37,7 @@ wallsnap::WallSnapConfig baseConfig() {
     config.maxDistanceMM = 2000;
     config.minConfidence = 35;
     config.maxAngleErrorDeg = 12.0;
+    config.maxDistanceErrorInches = 12.0;
     config.blend = 1.0;
     return config;
 }
@@ -163,6 +164,16 @@ void rejectsWrongFacingSensor() {
     assert(!result.success);
 }
 
+void rejectsBlockedObjectDistance() {
+    auto config = baseConfig();
+    wallsnap::WallSnap snap(config);
+    pros::Distance front({254, 254, 254});
+    snap.addSensor(fakeSensor(front, wallsnap::Wall::FRONT, 0.0, 5.0, 0.0));
+
+    const auto result = snap.calculateCorrection({80.0, 100.0, 0.0});
+    assert(!result.success);
+}
+
 void appliesSoftCorrectionBlend() {
     auto config = baseConfig();
     pros::Distance noneDistance({864});
@@ -193,7 +204,7 @@ int main() {
     rejectsNullSensor();
     rejectsOutOfRangeAndLowConfidence();
     rejectsWrongFacingSensor();
+    rejectsBlockedObjectDistance();
     appliesSoftCorrectionBlend();
     return 0;
 }
-

@@ -200,6 +200,8 @@ Common causes are:
 - the distance is outside `minDistanceMM` or `maxDistanceMM`
 - the sensor confidence is below `minConfidence`
 - the robot is not facing the configured wall closely enough
+- the reading does not match the wall distance predicted by the current pose,
+  which usually means a game object or another robot is blocking the sensor
 - the sensor sees a game object, robot, or field element instead of the wall
 - the configured sensor offset or target wall is wrong
 

@@ -1,12 +1,12 @@
 [
   {
     "metadata": {
-      "location": "https://github.com/LeonCai100/WallSnap/releases/download/v0.1.0/WallSnap%400.1.0.zip"
+      "location": "https://github.com/LeonCai100/WallSnap/releases/download/v0.1.1/WallSnap%400.1.1.zip"
     },
     "name": "WallSnap",
     "py/object": "pros.conductor.templates.base_template.BaseTemplate",
     "supported_kernels": "^4.2.1",
     "target": "v5",
-    "version": "0.1.0"
+    "version": "0.1.1"
   }
 ]
